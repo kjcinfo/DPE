@@ -1,0 +1,25 @@
+---
+# Tasks for installing and configuring the OpenTelemetry collector.  This
+# role installs the collector from official packages when available and
+# deploys a configuration file based on the chosen observability backend.
+
+- name: Ensure OpenTelemetry collector package is installed (Debian/Ubuntu)
+  apt:
+    name: otel-collector
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Ensure OpenTelemetry collector package is installed (RedHat/CentOS)
+  yum:
+    name: otel-collector
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Deploy OpenTelemetry collector configuration
+  template:
+    src: otel-config.yml.j2
+    dest: /etc/otel-collector-config.yaml
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart OpenTelemetry collector
