@@ -1,0 +1,18 @@
+---
+# Default variables for the OpenTelemetry role.  Users can override these
+# values via inventory variables or extra vars on the command line.
+
+### Observability backend selection
+# Specify which backend should receive metrics and traces.  Valid values
+# are 'grafana', 'elasticsearch' or 'opensearch'.
+observability_backend: grafana
+
+# Endpoint URLs for each backend type.  When using the 'grafana'
+# backend, the collector will export to the AWS managed Grafana workspace
+# with the default OTLP endpoint.  For Elasticsearch and OpenSearch,
+# specify the OTLP endpoint (for traces) and optionally the metrics
+# endpoint.  These values should correspond to the outputs of the
+# Terraform modules or your custom deployments.
+grafana_otlp_endpoint: "https://localhost:4317"
+elasticsearch_otlp_endpoint: "http://localhost:8200"
+opensearch_otlp_endpoint: "http://localhost:8200"

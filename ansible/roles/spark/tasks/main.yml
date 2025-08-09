@@ -1,0 +1,83 @@
+---
+# Install and configure Apache Spark on a host
+#
+# This role installs Spark in standalone mode.  It uses the `spark_role` variable
+# (master or worker) to determine which service script to run.  For multi‑node
+# clusters you should configure the master’s IP address via the
+# `spark_master_host` variable when provisioning the workers.
+
+- name: Ensure Java is installed
+  apt:
+    name: openjdk-11-jdk
+    state: present
+    update_cache: true
+  become: true
+
+- name: Create spark user
+  user:
+    name: spark
+    state: present
+  become: true
+
+- name: Download Spark tarball
+  get_url:
+    url: "https://downloads.apache.org/spark/spark-3.5.1/spark-3.5.1-bin-hadoop3.tgz"
+    dest: "/opt/spark.tgz"
+    mode: "0644"
+  become: true
+
+- name: Extract Spark
+  unarchive:
+    src: "/opt/spark.tgz"
+    dest: "/opt"
+    remote_src: yes
+  become: true
+
+- name: Create symlink for convenience
+  file:
+    src: "/opt/spark-3.5.1-bin-hadoop3"
+    dest: "/opt/spark"
+    state: link
+  become: true
+
+- name: Create systemd unit file for Spark Master
+  when: spark_role | default('master') == 'master'
+  copy:
+    dest: "/etc/systemd/system/spark-master.service"
+    content: |
+      [Unit]
+      Description=Apache Spark Master
+      After=network.target
+
+      [Service]
+      Type=simple
+      User=spark
+      ExecStart=/opt/spark/sbin/start-master.sh
+      ExecStop=/opt/spark/sbin/stop-master.sh
+      Restart=on-failure
+
+      [Install]
+      WantedBy=multi-user.target
+  notify: restart spark master
+  become: true
+
+- name: Create systemd unit file for Spark Worker
+  when: spark_role | default('worker') == 'worker'
+  copy:
+    dest: "/etc/systemd/system/spark-worker.service"
+    content: |
+      [Unit]
+      Description=Apache Spark Worker
+      After=network.target
+
+      [Service]
+      Type=simple
+      User=spark
+      ExecStart=/opt/spark/sbin/start-worker.sh spark://{{ spark_master_host | default('localhost:7077') }}
+      ExecStop=/opt/spark/sbin/stop-worker.sh
+      Restart=on-failure
+
+      [Install]
+      WantedBy=multi-user.target
+  notify: restart spark worker
+  become: true

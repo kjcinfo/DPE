@@ -1,0 +1,8 @@
+---
+# Handlers for Kafka role
+
+- name: restart kafka
+  systemd:
+    name: kafka
+    state: restarted
+    enabled: true

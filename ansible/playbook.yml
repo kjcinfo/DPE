@@ -1,0 +1,41 @@
+---
+# Top-level playbook to configure data platform components
+
+- hosts: kafka
+  become: true
+  roles:
+    - kafka
+
+- hosts: rdbms
+  become: true
+  roles:
+    - rdbms
+
+- hosts: elasticsearch
+  become: true
+  roles:
+    - elasticsearch
+
+- hosts: spark_master
+  become: true
+  roles:
+    - role: spark
+      vars:
+        spark_role: master
+
+- hosts: spark_workers
+  become: true
+  roles:
+    - role: spark
+      vars:
+        spark_role: worker
+
+# Configure observability on designated hosts.  This play installs the
+# OpenTelemetry collector and configures it to export metrics and traces
+# to the chosen backend (Grafana, Elasticsearch or OpenSearch).  Hosts in
+# the [observability] group should be defined in the inventory file with
+# the appropriate ansible_host values.
+- hosts: observability
+  become: true
+  roles:
+    - otel
