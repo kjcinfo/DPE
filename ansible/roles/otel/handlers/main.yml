@@ -1,0 +1,8 @@
+---
+# Handler for the OpenTelemetry collector.  Restarts the service
+# whenever the configuration file changes.
+
+- name: Restart OpenTelemetry collector
+  service:
+    name: otel-collector
+    state: restarted

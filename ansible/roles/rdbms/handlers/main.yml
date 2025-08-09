@@ -1,0 +1,8 @@
+---
+# Handlers for RDBMS role
+
+- name: restart postgresql
+  service:
+    name: postgresql
+    state: restarted
+    enabled: true

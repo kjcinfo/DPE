@@ -1,0 +1,14 @@
+---
+# Handlers for Spark role
+
+- name: restart spark master
+  systemd:
+    name: spark-master
+    state: restarted
+    enabled: true
+
+- name: restart spark worker
+  systemd:
+    name: spark-worker
+    state: restarted
+    enabled: true
