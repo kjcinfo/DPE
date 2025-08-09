@@ -1,0 +1,42 @@
+---
+# Install and configure a relational database on a host
+#
+# Currently this role focuses on PostgreSQL.  For other engines (e.g. MySQL)
+# you can extend the tasks with conditional logic based on the `rdbms_engine`
+# variable.
+
+- name: Ensure required packages are installed (PostgreSQL)
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: true
+  loop:
+    - postgresql
+    - postgresql-contrib
+  when: (rdbms_engine | default('postgres')) == 'postgres'
+  become: true
+
+- name: Ensure PostgreSQL service is enabled and started
+  service:
+    name: postgresql
+    state: started
+    enabled: true
+  when: (rdbms_engine | default('postgres')) == 'postgres'
+  become: true
+
+- name: Create database user
+  become_user: postgres
+  postgresql_user:
+    name: "{{ db_username | default('dpeuser') }}"
+    password: "{{ db_password | default('changeme') }}"
+    role_attr_flags: CREATEDB
+  when: (rdbms_engine | default('postgres')) == 'postgres'
+  become: true
+
+- name: Create database
+  become_user: postgres
+  postgresql_db:
+    name: "{{ db_name | default('dpedb') }}"
+    owner: "{{ db_username | default('dpeuser') }}"
+  when: (rdbms_engine | default('postgres')) == 'postgres'
+  become: true

@@ -1,0 +1,71 @@
+# Example configuration for the Data Platforms Engine (DPE)
+#
+# Copy this file to a new location (e.g. config.yaml) and adjust the
+# values for your environment.  The deploy.py script will consume this
+# configuration to build out your data platform.
+
+cloud_provider: aws
+
+# Specify your cloud provider specific settings here.  Only the section
+# matching `cloud_provider` will be used.
+
+aws:
+  region: us-east-1
+  vpc_id: vpc-12345678
+  kafka_cluster_name: dpe-kafka
+  kafka_subnets:
+    - subnet-11111111
+    - subnet-22222222
+    - subnet-33333333
+  rdbms_identifier: dpe-db
+  rdbms_username: admin
+  rdbms_password: Chang3me!
+  rdbms_subnet_group: dpe-db-subnet-group
+  rdbms_security_groups:
+    - sg-abcdef12
+  elasticsearch_domain_name: dpe-search
+  bucket_name: dpe-bucket
+  emr_name: dpe-emr
+  emr_service_role: EMR_DefaultRole
+  emr_job_flow_role: EMR_EC2_DefaultRole
+  # Optional: provide a KMS key ARN to encrypt Kafka at rest
+  # kafka_kms_key_arn: arn:aws:kms:us-east-1:123456789012:key/abcd1234-5678-90ef-ghij-klmnoprstuvw
+
+gcp:
+  project: my-gcp-project
+  region: us-central1
+  zone: us-central1-a
+  network: default
+  streaming_topic_name: dpe-stream
+  rdbms_name: dpe-db
+  rdbms_username: admin
+  rdbms_password: Chang3me!
+  rdbms_database_name: dpe
+  elasticsearch_vm_name: dpe-search
+  bucket_name: dpe-bucket
+  spark_cluster_name: dpe-spark
+
+azure:
+  location: westeurope
+  resource_group_name: dpe-rg
+  eventhub_namespace_name: dpe-namespace
+  eventhub_name: dpe-hub
+  rdbms_name: dpe-db
+  rdbms_admin_username: admin
+  rdbms_admin_password: Chang3me!
+  storage_account_name: dpeplatformsa
+
+# Data platforms to deploy.  Set each entry to true or false.
+data_platforms:
+  kafka: true
+  rdbms: true
+  elasticsearch: true
+  object_storage: true
+  spark: true
+
+# Configuration management tool to use: ansible, puppet or scripts
+configuration_management: ansible
+
+# Observability settings
+observability:
+  backend: grafana  # one of grafana, opensearch or elasticsearch

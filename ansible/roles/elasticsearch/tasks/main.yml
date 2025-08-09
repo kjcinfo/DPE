@@ -1,0 +1,36 @@
+---
+# Install and configure Elasticsearch on a host
+
+- name: Ensure Java is installed
+  apt:
+    name: openjdk-11-jdk
+    state: present
+    update_cache: true
+  become: true
+
+- name: Import Elasticsearch GPG key
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+  become: true
+
+- name: Add Elasticsearch APT repository
+  apt_repository:
+    repo: "deb https://artifacts.elastic.co/packages/8.x/apt stable main"
+    state: present
+    filename: elastic-8.x.list
+  become: true
+
+- name: Install Elasticsearch
+  apt:
+    name: elasticsearch
+    state: present
+    update_cache: true
+  become: true
+
+- name: Ensure Elasticsearch service is enabled and started
+  service:
+    name: elasticsearch
+    state: started
+    enabled: true
+  become: true

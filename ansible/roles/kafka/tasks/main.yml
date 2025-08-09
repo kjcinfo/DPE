@@ -1,0 +1,56 @@
+---
+# Install and configure Apache Kafka on a host
+
+- name: Ensure Java is installed
+  apt:
+    name: openjdk-11-jdk
+    state: present
+    update_cache: true
+  become: true
+
+- name: Ensure kafka user exists
+  user:
+    name: kafka
+    state: present
+  become: true
+
+- name: Download Kafka tarball
+  get_url:
+    url: "https://downloads.apache.org/kafka/3.7.0/kafka_2.13-3.7.0.tgz"
+    dest: "/opt/kafka.tgz"
+    mode: "0644"
+  become: true
+
+- name: Extract Kafka
+  unarchive:
+    src: "/opt/kafka.tgz"
+    dest: "/opt"
+    remote_src: yes
+  become: true
+
+- name: Create symlink for convenience
+  file:
+    src: "/opt/kafka_2.13-3.7.0"
+    dest: "/opt/kafka"
+    state: link
+  become: true
+
+- name: Deploy Kafka systemd unit file
+  copy:
+    dest: "/etc/systemd/system/kafka.service"
+    content: |
+      [Unit]
+      Description=Apache Kafka
+      After=network.target
+
+      [Service]
+      Type=simple
+      User=kafka
+      ExecStart=/opt/kafka/bin/kafka-server-start.sh /opt/kafka/config/server.properties
+      ExecStop=/opt/kafka/bin/kafka-server-stop.sh
+      Restart=on-failure
+
+      [Install]
+      WantedBy=multi-user.target
+  notify: restart kafka
+  become: true
