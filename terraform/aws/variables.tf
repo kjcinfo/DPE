@@ -188,7 +188,6 @@ variable "enable_rdbms" {
   default     = true
 }
 
-
 variable "enable_elasticsearch" {
   description = <<EOT
 Whether to create the managed OpenSearch/Elasticsearch domain.  By default the
@@ -250,6 +249,38 @@ variable "enable_spark" {
   description = "Whether to create the EMR cluster"
   type        = bool
   default     = true
+}
+
+# How to deploy the Spark compute layer on AWS.  Valid values are:
+#   - "serverless": use Amazon EMR Serverless (preferred)
+#   - "emr_cluster": provision a traditional EMR cluster (legacy)
+#   - "none": skip Spark deployment entirely
+# The default is "serverless".  When set to "serverless" the module
+# provisions an `aws_emrserverless_application` resource.  When set to
+# "emr_cluster" it creates an `aws_emr_cluster` resource.  When set to
+# "none" no Spark resources are created even if `enable_spark` is true.
+variable "spark_deployment" {
+  description = "Deployment method for Spark on AWS (serverless, emr_cluster or none)"
+  type        = string
+  default     = "serverless"
+}
+
+# Release label for EMR Serverless applications.  See the AWS documentation for
+# supported values.  The default corresponds to the latest EMR 6.x series at
+# the time this module was authored.  Only used when `spark_deployment` is
+# "serverless".
+variable "spark_serverless_release_label" {
+  description = "Release label for the EMR Serverless application"
+  type        = string
+  default     = "emr-6.6.0"
+}
+
+# The application type for the EMR Serverless application.  For Spark jobs
+# this should be set to "spark".
+variable "spark_serverless_type" {
+  description = "Application type for the EMR Serverless application (e.g. spark)"
+  type        = string
+  default     = "spark"
 }
 
 # Additional security‑related variables

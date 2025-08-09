@@ -144,7 +144,12 @@ resource "aws_s3_bucket" "object_storage" {
 }
 
 resource "aws_emr_cluster" "spark" {
-  count         = var.enable_spark ? 1 : 0
+  # Provision a traditional EMR cluster only when Spark is enabled and the
+  # deployment mode is set to "emr_cluster".  This resource is kept for
+  # backward compatibility but is no longer the default mechanism for running
+  # Spark jobs in this framework.
+  count = var.enable_spark && var.spark_deployment == "emr_cluster" ? 1 : 0
+
   name          = var.emr_name
   release_label = var.emr_release_label
   applications  = ["Spark"]
