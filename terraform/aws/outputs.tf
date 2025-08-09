@@ -23,6 +23,14 @@ output "emr_cluster_id" {
   value       = length(aws_emr_cluster.spark) > 0 ? aws_emr_cluster.spark[0].id : null
 }
 
+## Serverless Spark output.  When Spark is deployed using EMR Serverless
+## (i.e. `spark_deployment = \"serverless\"`), return the ARN of the
+## application.  Otherwise this output will be null.
+output "spark_serverless_application_arn" {
+  description = "ARN of the EMR Serverless Spark application"
+  value       = length(aws_emrserverless_application.spark) > 0 ? aws_emrserverless_application.spark[0].arn : null
+}
+
 ## Public IP addresses for the self‑managed search cluster nodes.  When
 ## `search_deployment` is set to `instance`, this output lists the public
 ## IPs of all EC2 instances created for the search cluster.  If the

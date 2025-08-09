@@ -139,6 +139,19 @@ variable "enable_spark" {
   default     = true
 }
 
+# How to deploy the Spark compute layer on GCP.  Valid values are:
+#   - "cluster": provision a Dataproc cluster (default)
+#   - "serverless": do not create a cluster; jobs should be submitted to
+#       Dataproc Serverless using the gcloud CLI or APIs.  The Terraform
+#       provider does not currently support creating a serverless Spark
+#       environment.
+#   - "none": skip Spark deployment entirely.
+variable "spark_deployment" {
+  description = "Deployment method for Spark on GCP (cluster, serverless or none)"
+  type        = string
+  default     = "cluster"
+}
+
 variable "observability_backend" {
   description = "Observability backend to deploy (grafana, elasticsearch, opensearch)"
   type        = string
