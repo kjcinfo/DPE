@@ -188,16 +188,62 @@ variable "enable_rdbms" {
   default     = true
 }
 
+
 variable "enable_elasticsearch" {
-  description = "Whether to create the OpenSearch domain"
+  description = <<EOT
+Whether to create the managed OpenSearch/Elasticsearch domain.  By default the
+framework deploys a self‑managed search cluster on EC2 instances or Kubernetes,
+so this value can usually remain false.  Only set this to true when
+`search_deployment = "domain"` and you explicitly wish to provision the AWS
+OpenSearch Service domain.  When set to true and `search_deployment` is not
+`domain` this flag has no effect.
+EOT
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "enable_object_storage" {
   description = "Whether to create the S3 bucket"
   type        = bool
   default     = true
+}
+
+###############################
+# Self-managed search variables
+###############################
+
+## Deployment method for the search engine.  Supported values are
+## `instance` (self-managed cluster on EC2 instances) and `kubernetes` (self-managed
+## cluster on an EKS Kubernetes cluster).  When using a self-managed
+## deployment you can disable the built-in OpenSearch/Elasticsearch domain
+## by setting `enable_elasticsearch` to false.
+variable "search_deployment" {
+  description = "Deployment method for the search engine (instance or kubernetes)"
+  type        = string
+  default     = "instance"
+}
+
+## Number of nodes to deploy for the self-managed search cluster.  A minimum
+## of three nodes is recommended for production.  Only used when
+## `search_deployment = \"instance\"`.
+variable "search_node_count" {
+  description = "Number of nodes in the self-managed search cluster"
+  type        = number
+  default     = 3
+}
+
+## Instance type to use for each node in the self-managed search cluster.
+variable "search_instance_type" {
+  description = "Instance type for self-managed search nodes"
+  type        = string
+  default     = "t3.medium"
+}
+
+## Root volume size (in GB) for each self-managed search node.
+variable "search_volume_size" {
+  description = "EBS volume size (GB) for self-managed search nodes"
+  type        = number
+  default     = 50
 }
 
 variable "enable_spark" {

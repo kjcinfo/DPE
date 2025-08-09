@@ -82,9 +82,22 @@ resource "aws_db_instance" "rdbms" {
   }
 }
 
+#############################################
+# Managed OpenSearch/Elasticsearch domain
+#
+# This resource provisions an AWS OpenSearch Service domain.  By default
+# this domain is disabled because the project now favors a self‑managed
+# search cluster (see `search_self_managed.tf`) for both observability
+# and search use cases.  If you still wish to deploy the managed
+# service, set `search_deployment = "domain"` and leave
+# `enable_elasticsearch` set to true.  When `search_deployment` is
+# anything else (e.g. "instance" or "kubernetes") this resource will
+# not be created.  Managed domains are not recommended for the primary
+# observability stack due to version lag and limited control.
 resource "aws_opensearch_domain" "elasticsearch" {
-  count         = var.enable_elasticsearch ? 1 : 0
-  domain_name   = var.elasticsearch_domain_name
+  count = var.enable_elasticsearch && var.search_deployment == "domain" ? 1 : 0
+
+  domain_name    = var.elasticsearch_domain_name
   engine_version = var.elasticsearch_version
 
   cluster_config {
@@ -97,7 +110,7 @@ resource "aws_opensearch_domain" "elasticsearch" {
     volume_size = var.elasticsearch_volume_size
   }
 
-  # Enable encryption at rest and node-to-node encryption for enhanced security
+  # Enable encryption at rest and node‑to‑node encryption for enhanced security
   encrypt_at_rest {
     enabled = true
   }
