@@ -23,6 +23,16 @@ output "emr_cluster_id" {
   value       = length(aws_emr_cluster.spark) > 0 ? aws_emr_cluster.spark[0].id : null
 }
 
+## Public IP addresses for the self‑managed search cluster nodes.  When
+## `search_deployment` is set to `instance`, this output lists the public
+## IPs of all EC2 instances created for the search cluster.  If the
+## search cluster is deployed via Kubernetes or is disabled, this
+## output will be an empty list.
+output "search_instance_ips" {
+  description = "Public IPs of the self‑managed search cluster nodes"
+  value       = var.search_deployment == "instance" ? [for i in aws_instance.search_self_managed : i.public_ip] : []
+}
+
 
 ## Consolidated observability output.  Returns the endpoint for whichever
 ## observability backend is chosen via the `observability_backend` variable.
