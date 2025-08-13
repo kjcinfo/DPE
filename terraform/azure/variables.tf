@@ -108,6 +108,17 @@ variable "enable_spark" {
   default     = false
 }
 
+# How to deploy the Spark compute layer on Azure.  Valid values are:
+#   - "synapse": use an Azure Synapse Analytics Spark pool (recommended for serverless)
+#   - "databricks": deploy an Azure Databricks workspace and cluster
+#   - "none": skip Spark deployment entirely
+#   The default is "synapse" but no resources are currently provisioned.
+variable "spark_deployment" {
+  description = "Deployment method for Spark on Azure (synapse, databricks or none)"
+  type        = string
+  default     = "synapse"
+}
+
 variable "observability_backend" {
   description = "Observability backend to deploy on Azure (grafana, elasticsearch, opensearch)"
   type        = string

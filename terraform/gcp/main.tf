@@ -86,7 +86,12 @@ resource "google_storage_bucket" "object_storage" {
 }
 
 resource "google_dataproc_cluster" "spark_cluster" {
-  count = var.enable_spark ? 1 : 0
+  # Create a Dataproc cluster only when Spark is enabled and the deployment
+  # mode is set to "cluster".  When set to "serverless", no cluster is
+  # created and users should submit jobs to Dataproc Serverless using
+  # `gcloud dataproc batches` or the Dataproc API.  When set to "none" the
+  # Spark component is completely disabled.
+  count = var.enable_spark && var.spark_deployment == "cluster" ? 1 : 0
   name   = var.spark_cluster_name
   region = var.region
 
